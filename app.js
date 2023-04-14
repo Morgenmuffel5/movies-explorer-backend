@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
+/*const cors = require('cors');*/
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const usersRouter = require('./routes/users');
@@ -19,11 +19,11 @@ const app = express();
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.use(cors);
 /**
  * разрешение кросс доменных запросов
  */
-app.use(cors());
+/*app.use(cors());*/
+app.use(cors);
 
 app.use(express.json());
 app.use(bodyParser.json());
