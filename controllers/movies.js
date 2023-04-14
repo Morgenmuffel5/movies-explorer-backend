@@ -1,6 +1,6 @@
 const Movie = require('../models/movie');
-const NotFound = require('../errors/notFoundError');
-const BadRequest = require('../errors/badRequestError');
+const NotFound = require('../errors/NotFoundError');
+const BadRequest = require('../errors/BadRequestError');
 const NotOwner = require('../errors/NotOwnerError');
 
 
