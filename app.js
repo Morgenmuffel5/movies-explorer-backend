@@ -10,6 +10,7 @@ const { login, createNewUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./midlewares/logger');
 const NotFoundError = require('./errors/NotFoundError');
 const auth = require('./midlewares/auth');
+const cors = require('./middlewares/cors');
 
 const { PORT = 3000 } = process.env;
 
@@ -18,6 +19,7 @@ const app = express();
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
+app.use(cors);
 /**
  * разрешение кросс доменных запросов
  */
