@@ -87,14 +87,14 @@ const movieModel = new mongoose.Schema({
   /**
    *  название фильма на русском
    */
-  nameRu: {
+  nameRU: {
     type: String,
     required: true,
   },
   /**
    *  название фильма на английском
    */
-  nameEng: {
+  nameEN: {
     type: String,
     required: true,
   }
