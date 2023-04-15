@@ -11,7 +11,6 @@ const { requestLogger, errorLogger } = require('./midlewares/logger');
 const NotFoundError = require('./errors/NotFoundError');
 const auth = require('./midlewares/auth');
 const cors = require('./midlewares/cors');
-const limiter = require('./midlewares/rate-limiter');
 
 const { PORT = 3000 } = process.env;
 
@@ -25,11 +24,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb');
  */
 /*app.use(cors());*/
 app.use(cors);
-
-/**
- * Ограничение кол
- */
-app.use(limiter);
 
 app.use(express.json());
 app.use(bodyParser.json());
