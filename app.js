@@ -17,7 +17,6 @@ const {
   createUserValidator,
   loginValidator,
 } = require('./midlewares/validator');
-const router = require('./routes/index')
 
 const { PORT = 3000 } = process.env;
 
@@ -42,10 +41,32 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 /**
- * подключение роутов
+ * вход на сайт
  */
+app.post('/signin', loginValidator, login);
 
-app.use(router);
+/**
+ * регистрация
+ */
+app.post('/signup', createUserValidator, createNewUser);
+
+/**
+ * защита роутов, проверка токена
+ */
+app.use(auth);
+
+/**
+ * роутер запросов для юзера
+ */
+app.use('/users', usersRouter);
+/**
+ * роутер запросов для фильмов
+ */
+app.use('/movies', movieRouter);
+/**
+ * роутер для несуществующей страницы
+ */
+app.use('*', auth, (_, __, next) => next(new NotFoundError(messages.notFound)));
 
 /**
  * логирование ошибок
