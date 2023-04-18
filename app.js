@@ -18,7 +18,6 @@ const {
   createUserValidator,
   loginValidator,
 } = require('./midlewares/validator');
-const limiter = require('./midlewares/limiter');
 
 const { PORT = 3000 } = process.env;
 
@@ -42,11 +41,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
  * логирование запросов
  */
 app.use(requestLogger);
-
-/**
- * ограничение запросов
- */
-app.use(limiter);
 
 /**
  * вход на сайт
