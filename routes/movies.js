@@ -5,7 +5,7 @@ const urlValidator = require('../constants/constants');
 const {
   getUserMovies,
   createMovie,
-  deleteMovie
+  deleteMovie,
 } = require('../controllers/movies');
 
 /**
@@ -28,7 +28,7 @@ movieRouter.post('/', celebrate({
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
     thumbnail: Joi.string().required().pattern(urlValidator),
-    movieId: Joi.string().required(),
+    movieId: Joi.number().required(),
   }),
 }), createMovie);
 

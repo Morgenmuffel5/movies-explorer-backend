@@ -4,7 +4,7 @@ const User = require('../models/user');
 const NotFound = require('../errors/NotFoundError');
 const BadRequest = require('../errors/BadRequestError');
 const EmailDoubleError = require('../errors/EmailDoubleError');
-
+const message = require('../constants/messages');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -17,7 +17,7 @@ const getCurrentUser = (req, res, next) => {
       if (user) {
         res.send({ data: user });
       } else {
-        next(new NotFound('Пользователь не найден'));
+        next(new NotFound(message.userNotFound));
       }
     })
     .catch(next);
@@ -40,15 +40,15 @@ const updateUser = (req, res, next) => {
       if (user) {
         res.send({ data: user });
       } else {
-        next(new NotFound('Пользователь не найден'));
+        next(new NotFound(message.userNotFound));
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Переданы некорректные данные пользователя'));
+        next(new BadRequest(message.badRequestEditUser));
       }
-      if (err.name === 'CastError') {
-        next(new BadRequest('Передан некорректный id пользователя'));
+      if (err.code === 11000) {
+        next(new EmailDoubleError(message.emailDouble));
       } else {
         next(err);
       }
@@ -64,8 +64,7 @@ const createNewUser = (req, res, next) => {
   } = req.body;
   bcrypt
     .hash(password, 10)
-    .then((hash) =>
-      User.create({
+    .then((hash) => User.create({
       name, email, password: hash,
     }))
     .then((userdata) => res
@@ -76,9 +75,9 @@ const createNewUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Неверный email или пароль'));
+        next(new BadRequest(message.badRequestCreateUser));
       } else if (err.code === 11000) {
-        next(new EmailDoubleError('Пользователь с таким email уже существует'));
+        next(new EmailDoubleError(message.emailDouble));
       } else {
         next(err);
       }
@@ -103,10 +102,9 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-
 module.exports = {
   getCurrentUser,
   createNewUser,
   updateUser,
-  login
+  login,
 };

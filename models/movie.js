@@ -81,7 +81,7 @@ const movieModel = new mongoose.Schema({
    * id фильма
    */
   movieId: {
-    type: String,
+    type: Number,
     required: true,
   },
   /**
@@ -97,7 +97,7 @@ const movieModel = new mongoose.Schema({
   nameEN: {
     type: String,
     required: true,
-  }
+  },
 });
 
 module.exports = mongoose.model('movie', movieModel);

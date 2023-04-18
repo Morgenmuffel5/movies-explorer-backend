@@ -1,16 +1,15 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-/*const cors = require('cors');*/
+/* const cors = require('cors'); */
 const bodyParser = require('body-parser');
-const { celebrate, Joi, errors } = require('celebrate');
-const usersRouter = require('./routes/users');
-const movieRouter = require('./routes/movies');
-const { login, createNewUser } = require('./controllers/users');
+const { errors } = require('celebrate');
+const helmet = require('helmet');
 const { requestLogger, errorLogger } = require('./midlewares/logger');
-const NotFoundError = require('./errors/NotFoundError');
-const auth = require('./midlewares/auth');
 const cors = require('./midlewares/cors');
+const router = require('./routes/index');
+const errorHandler = require('./midlewares/errorConstructor');
+const limiter = require('./midlewares/limiter');
 
 const { PORT = 3000 } = process.env;
 
@@ -22,8 +21,13 @@ mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb');
 /**
  * разрешение кросс доменных запросов
  */
-/*app.use(cors());*/
+/* app.use(cors()); */
 app.use(cors);
+
+/**
+ * helmet
+ */
+app.use(helmet());
 
 app.use(express.json());
 app.use(bodyParser.json());
@@ -35,49 +39,30 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 /**
- * вход на сайт
+ * ограничение запросов
  */
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
+app.use(limiter);
 
 /**
- * регистрация
+ * все роуты
  */
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), createNewUser);
-
-/**
- * защита роутов, проверка токена
- */
-app.use(auth);
-
-/**
- * роутер запросов для юзера
- */
-app.use('/users', usersRouter);
-/**
- * роутер запросов для фильмов
- */
-app.use('/movies', movieRouter);
-/**
- * роутер для несуществующей страницы
- */
-app.use('*', auth, (_, __, next) => next(new NotFoundError('Такой страницы не существует')));
+app.use('/', router);
 
 /**
  * логирование ошибок
  */
 app.use(errorLogger);
 
+/**
+ * ошибки celebrate
+ */
+app.use(errors());
+
+/**
+ * обработчик ошибок
+ */
+app.use(errorHandler);
+
 app.listen(PORT, () => {
-  console.log('Приложение работает')
-})
+  console.log('Приложение работает');
+});
