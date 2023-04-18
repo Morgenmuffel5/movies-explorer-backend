@@ -8,7 +8,7 @@ const messages = require('../constants/messages');
  * получение всех сохраненных фильмов текущего пользователя
  */
 const getUserMovies = (req, res, next) => {
-  Movie.find({owner: req.user._id})
+  Movie.find({ owner: req.user._id })
     .then((movies) => res.send(movies))
     .catch(next);
 };
@@ -18,18 +18,41 @@ const getUserMovies = (req, res, next) => {
  */
 const createMovie = (req, res, next) => {
   const {
-    country, director, duration, year, description, image, trailerLink, nameRU, nameEN, thumbnail, movieId
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    nameRU,
+    nameEN,
+    thumbnail,
+    movieId,
   } = req.body;
 
-    Movie.create({ country, director, duration, year, description, image, trailerLink, nameRU, nameEN, thumbnail, movieId, owner: req.user._id })
+  Movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    nameRU,
+    nameEN,
+    thumbnail,
+    movieId,
+    owner: req.user._id,
+  })
     .then((movie) => res
       .status('201')
       .send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequest(messages.createMovieBadRequest));
+        next(new BadRequest(messages.createMovieBadRequest));
       } else {
-        return next(err);
+        next(err);
       }
     });
 };
@@ -47,15 +70,13 @@ const deleteMovie = async (req, res, next) => {
       const movie = await Movie.findByIdAndRemove(req.params.movieId);
       res.send(movie);
     } else {
-     return  next(new NotOwner(messages.notOwner));
+      next(new NotOwner(messages.notOwner));
     }
   } catch (err) {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
-      return next(new BadRequest(messages.deleteMovie));
-    } else if (err.name === 'CastError') {
-      return next(new BadRequest(messages.deleteMovie));
-    }else {
-      return next(err);
+      next(new BadRequest(messages.deleteMovie));
+    } else {
+      next(err);
     }
   }
 };
@@ -63,5 +84,5 @@ const deleteMovie = async (req, res, next) => {
 module.exports = {
   getUserMovies,
   createMovie,
-  deleteMovie
+  deleteMovie,
 };

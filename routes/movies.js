@@ -1,6 +1,4 @@
 const movieRouter = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
-const urlValidator = require('../constants/constants');
 const {
   createFilmValidator,
   deleteFilmValidator,
@@ -9,7 +7,7 @@ const {
 const {
   getUserMovies,
   createMovie,
-  deleteMovie
+  deleteMovie,
 } = require('../controllers/movies');
 
 /**

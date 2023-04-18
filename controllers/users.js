@@ -6,7 +6,6 @@ const BadRequest = require('../errors/BadRequestError');
 const EmailDoubleError = require('../errors/EmailDoubleError');
 const messages = require('../constants/messages');
 
-
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 /**
@@ -18,7 +17,7 @@ const getCurrentUser = (req, res, next) => {
       if (user) {
         res.send({ data: user });
       } else {
-        return next(new NotFound(messages.userNotFound));
+        next(new NotFound(messages.userNotFound));
       }
     })
     .catch(next);
@@ -41,17 +40,17 @@ const updateUser = (req, res, next) => {
       if (user) {
         res.send({ data: user });
       } else {
-        return next(new NotFound(messages.userNotFound));
+        next(new NotFound(messages.userNotFound));
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequest(messages.updateUserBadRequest));
+        next(new BadRequest(messages.updateUserBadRequest));
       }
       if (err.code === 11000) {
-        return next(new EmailDoubleError(messages.emailDouble));
+        next(new EmailDoubleError(messages.emailDouble));
       } else {
-        return  next(err);
+        next(err);
       }
     });
 };
@@ -65,10 +64,7 @@ const createNewUser = (req, res, next) => {
   } = req.body;
   bcrypt
     .hash(password, 10)
-    .then((hash) =>
-      User.create({
-      name, email, password: hash,
-    }))
+    .then((hash) => User.create({ name, email, password: hash }))
     .then((userdata) => res
       .status('201').send({
         name: userdata.name,
@@ -77,9 +73,9 @@ const createNewUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequest(messages.createUserBadRequest));
+        next(new BadRequest(messages.createUserBadRequest));
       } else if (err.code === 11000) {
-        return next(new EmailDoubleError(messages.emailDouble));
+        next(new EmailDoubleError(messages.emailDouble));
       } else {
         next(err);
       }
@@ -104,10 +100,9 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-
 module.exports = {
   getCurrentUser,
   createNewUser,
   updateUser,
-  login
+  login,
 };

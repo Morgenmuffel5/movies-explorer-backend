@@ -98,7 +98,7 @@ const movieModel = new mongoose.Schema({
   nameEN: {
     type: String,
     required: true,
-  }
+  },
 });
 
 module.exports = mongoose.model('movie', movieModel);

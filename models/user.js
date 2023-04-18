@@ -24,7 +24,7 @@ const userModel = new mongoose.Schema({
       validator: (v) => validator.isEmail(v),
       message: 'Неккоректная почта',
     },
-  }
+  },
 });
 
 userModel.statics.findUserByCredentials = function (email, password) {

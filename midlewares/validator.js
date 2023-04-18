@@ -1,5 +1,5 @@
-const {celebrate, Joi} = require("celebrate");
-const urlValidator = require("../constants/constants");
+const { celebrate, Joi } = require('celebrate');
+const urlValidator = require('../constants/constants');
 
 const createFilmValidator = () => celebrate({
   body: Joi.object().keys({
