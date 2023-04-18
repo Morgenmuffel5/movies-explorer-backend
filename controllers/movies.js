@@ -2,7 +2,7 @@ const Movie = require('../models/movie');
 const NotFound = require('../errors/NotFoundError');
 const BadRequest = require('../errors/BadRequestError');
 const NotOwner = require('../errors/NotOwnerError');
-
+const messages = require('../constants/messages');
 
 /**
  * получение всех сохраненных фильмов текущего пользователя
@@ -27,9 +27,9 @@ const createMovie = (req, res, next) => {
       .send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Не удалось создать фильм, переданы некорректные данные'));
+        return next(new BadRequest(messages.createMovieBadRequest));
       } else {
-        next(err);
+        return next(err);
       }
     });
 };
@@ -42,18 +42,20 @@ const deleteMovie = async (req, res, next) => {
     const movieId = await Movie.findOne({ _id: req.params.movieId });
     const owner = req.user._id;
     if (movieId === null) {
-      next(new NotFound('Переданы некорректные данные для удаления фильма'));
+      next(new NotFound(messages.movieNotFound));
     } else if (movieId.owner.valueOf() === owner) {
       const movie = await Movie.findByIdAndRemove(req.params.movieId);
       res.send(movie);
     } else {
-      next(new NotOwner('Невозможно удалить фильм другого пользователя'));
+     return  next(new NotOwner(messages.notOwner));
     }
   } catch (err) {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
-      next(new BadRequest('Невозможно удалить фильм, переданы некорректные данные'));
-    } else {
-      next(err);
+      return next(new BadRequest(messages.deleteMovie));
+    } else if (err.name === 'CastError') {
+      return next(new BadRequest(messages.deleteMovie));
+    }else {
+      return next(err);
     }
   }
 };

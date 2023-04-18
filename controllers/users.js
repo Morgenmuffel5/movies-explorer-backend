@@ -4,6 +4,7 @@ const User = require('../models/user');
 const NotFound = require('../errors/NotFoundError');
 const BadRequest = require('../errors/BadRequestError');
 const EmailDoubleError = require('../errors/EmailDoubleError');
+const messages = require('../constants/messages');
 
 
 const { NODE_ENV, JWT_SECRET } = process.env;
@@ -17,7 +18,7 @@ const getCurrentUser = (req, res, next) => {
       if (user) {
         res.send({ data: user });
       } else {
-        next(new NotFound('Пользователь не найден'));
+        return next(new NotFound(messages.userNotFound));
       }
     })
     .catch(next);
@@ -40,17 +41,17 @@ const updateUser = (req, res, next) => {
       if (user) {
         res.send({ data: user });
       } else {
-        next(new NotFound('Пользователь не найден'));
+        return next(new NotFound(messages.userNotFound));
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Переданы некорректные данные пользователя'));
+        return next(new BadRequest(messages.updateUserBadRequest));
       }
-      if (err.name === 'CastError') {
-        next(new BadRequest('Передан некорректный id пользователя'));
+      if (err.code === 11000) {
+        return next(new EmailDoubleError(messages.emailDouble));
       } else {
-        next(err);
+        return  next(err);
       }
     });
 };
@@ -76,9 +77,9 @@ const createNewUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Неверный email или пароль'));
+        return next(new BadRequest(messages.createUserBadRequest));
       } else if (err.code === 11000) {
-        next(new EmailDoubleError('Пользователь с таким email уже существует'));
+        return next(new EmailDoubleError(messages.emailDouble));
       } else {
         next(err);
       }

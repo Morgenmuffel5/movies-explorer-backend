@@ -11,6 +11,13 @@ const { requestLogger, errorLogger } = require('./midlewares/logger');
 const NotFoundError = require('./errors/NotFoundError');
 const auth = require('./midlewares/auth');
 const cors = require('./midlewares/cors');
+const errorMethood = require('./midlewares/errorMethood');
+const messages = require('./constants/messages');
+const {
+  createUserValidator,
+  loginValidator,
+} = require('./midlewares/validator');
+const router = require('./routes/index')
 
 const { PORT = 3000 } = process.env;
 
@@ -35,48 +42,28 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 /**
- * вход на сайт
+ * подключение роутов
  */
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
 
-/**
- * регистрация
- */
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), createNewUser);
-
-/**
- * защита роутов, проверка токена
- */
-app.use(auth);
-
-/**
- * роутер запросов для юзера
- */
-app.use('/users', usersRouter);
-/**
- * роутер запросов для фильмов
- */
-app.use('/movies', movieRouter);
-/**
- * роутер для несуществующей страницы
- */
-app.use('*', auth, (_, __, next) => next(new NotFoundError('Такой страницы не существует')));
+app.use(router);
 
 /**
  * логирование ошибок
  */
 app.use(errorLogger);
+
+/**
+ * celebrate ошибки
+ */
+app.use(errors());
+
+/**
+ * Обработчик ошибок
+ */
+app.use(errorMethood)
+
+
+
 
 app.listen(PORT, () => {
   console.log('Приложение работает')

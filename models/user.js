@@ -2,13 +2,14 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const UnauthorizedError = require('../errors/UnauthorizedError');
+const messages = require('../constants/messages');
 
 const userModel = new mongoose.Schema({
   name: {
     type: String,
     minlength: 2,
     maxlength: 30,
-    default: 'Неизвестный пользователь',
+    required: true,
   },
   password: {
     type: String,
@@ -31,13 +32,13 @@ userModel.statics.findUserByCredentials = function (email, password) {
     .select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new UnauthorizedError('Пользователь не авторизован, войдите или зарегистрируйтесь'));
+        return Promise.reject(new UnauthorizedError(messages.login));
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new UnauthorizedError('Пользователь не авторизован,  войдите или зарегистрируйтесь'));
+            return Promise.reject(new UnauthorizedError(messages.login));
           }
           return user;
         });
