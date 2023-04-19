@@ -11,12 +11,12 @@ const router = require('./routes/index');
 const errorHandler = require('./midlewares/errorConstructor');
 const limiter = require('./midlewares/limiter');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, MONGO, NODE_ENV } = process.env;
 
 const app = express();
 
 mongoose.set('strictQuery', true);
-mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb');
+mongoose.connect(NODE_ENV === 'production' ? MONGO : 'mongodb://127.0.0.1:27017/bitfilmsdb');
 
 /**
  * разрешение кросс доменных запросов

@@ -3,9 +3,7 @@ const {
   getCurrentUser,
   updateUser,
 } = require('../controllers/users');
-const {
-  editUserValidator,
-} = require('../midlewares/validator');
+const { editUserValidator } = require('../midlewares/validator');
 
 /**
  * получение текущего пользователя

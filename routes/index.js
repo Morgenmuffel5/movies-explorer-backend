@@ -1,32 +1,20 @@
 const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
 const { login, createNewUser } = require('../controllers/users');
 const auth = require('../midlewares/auth');
 const usersRouter = require('./users');
 const movieRouter = require('./movies');
 const NotFoundError = require('../errors/NotFoundError');
 const message = require('../constants/messages');
-
+const { loginValidator, createUserValidator } = require('../midlewares/validator');
 /**
  * вход на сайт
  */
-router.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
+router.post('/signin', loginValidator, login);
 
 /**
  * регистрация
  */
-router.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), createNewUser);
+router.post('/signup', createUserValidator, createNewUser);
 
 /**
  * защита роутов, проверка токена
